@@ -12,40 +12,40 @@
         data-sap-ui-compatVersion="edge"  
     ></script>
 <script type="text/javascript">
-  var sServiceUrl2 = 'https://cors-anywhere.herokuapp.com/' +
-    'http://services.odata.org/V2/Northwind/Northwind.svc';
-
-  var oModel = new sap.ui.model.odata.v2.ODataModel(sServiceUrl2, true);
-  oModel.attachMetadataLoaded(oModel, function () {
-    var properties = oModel.oMetadata._getEntityTypeByPath('/Categories').property;
-    var serviceMetaData = oModel.getServiceMetadata();
-    var oMetaModel = new sap.ui.model.json.JSONModel();
-    oMetaModel.setData({
-      columns: properties
-    });
-    sap.ui.getCore().setModel(oMetaModel, 'meta');
-    oTable.bindColumns('meta>/columns', function (sId, oContext) {
-      var sColumnId = oContext.getObject().name;
-      return new sap.ui.table.Column({
-        id: sColumnId,
-        label: sColumnId,
-        template: new sap.ui.commons.TextView({
-          text: { path: 'data>' + sColumnId }
-        }),
-        sortProperty: sColumnId,
-        filterProperty: sColumnId
-      });
-    });
-    // haven't set handle the data
-    oTable.bindRows('data>' + '/Categories');
-  })
-
   var oTable = new sap.ui.table.Table({
     title: 'OData Model dynamic column and data binding',
     showNoData: true,
     columnHeaderHeight: 10,
     visibleRowCount: 7
   });
+  var sServiceUrl2 = 'https://cors-anywhere.herokuapp.com/' +
+    'http://services.odata.org/V2/Northwind/Northwind.svc';
+
+  var oModel = new sap.ui.model.odata.v2.ODataModel(sServiceUrl2, true);
+  sap.ui.getCore().setModel(oModel);
+  oModel.attachMetadataLoaded(oModel, function () {
+    'use strict';
+    var properties = oModel.oMetadata._getEntityTypeByPath('/Categories').property;
+    var oMetaModel = new sap.ui.model.json.JSONModel();
+    oMetaModel.setData({
+      columns: properties
+    });
+    oTable.setModel(oMetaModel, 'meta');
+    oTable.bindColumns('meta>/columns', function (sId, oContext) {
+      var sColumnId = oContext.getObject().name;
+      return new sap.ui.table.Column({
+        id: sColumnId,
+        label: sColumnId,
+        template: new sap.ui.commons.TextView({
+          text: { path: sColumnId }
+        }),
+        sortProperty: sColumnId,
+        filterProperty: sColumnId
+      });
+    });
+    oTable.bindRows('/Categories');
+  });
+
   oTable.placeAt('content');
 </script>
 </head>
